@@ -1,0 +1,767 @@
+
+What is Pandas?
+An important step for any data scientist is to prepare and clean the data so that it could be used later for deeper analysis. Pandas library helps in ETL process (Extract, Transform and Load).
+
+Pandas provides rich set of functions to process various types of data. It is built on top of the NumPy and matplotlib library and one can harness the power of both these libraries in tandem with the power of pandas.
+
+In [1]:
+import numpy as np
+import pandas as pd
+Data Structures in Pandas
+Pandas can work with three data structures:
+
+Series-1 dimension array with homgenous or hetrogenous data
+DataFrame - 2 dimensions denoting rows and columns
+Panel - 3 dimensions denoting x, y, z axis (Example Excel)
+Series
+The main difference between a series and NumPy array is that series may have axis labels, a NumPy array doesn't.
+
+Creating Series
+The constructor for series is : pandas.Series(data, index, dtype, copy)
+
+Here,
+
+data: data (can be lists, ndarrays, dictionaries etc.)
+index: unique, hashable and same length as data (default is np.arange(n) where n is length of data)
+dtype: data type of series values
+copy: copy data (default False)
+In [2]:
+pd.Series([1,2,3,4])
+Out[2]:
+0    1
+1    2
+2    3
+3    4
+dtype: int64
+In [3]:
+# as the above output shows every series has index value. In pandas we can pass index values too
+lst = [1,2,3,4]
+lbl = ['a','b','c','d']
+pd.Series(lst, index=lbl)
+Out[3]:
+a    1
+b    2
+c    3
+d    4
+dtype: int64
+In [4]:
+# changing datatypes of series
+pd.Series([10,20,30,40],dtype='float')
+Out[4]:
+0    10.0
+1    20.0
+2    30.0
+3    40.0
+dtype: float64
+In [5]:
+# creating series from dictionary
+# here the key will be considered as the index and values will become the series
+
+dic = {'firstname':'Donald Duck', 'age':65, 'city':'Disney World'}
+pd.Series(dic)
+Out[5]:
+firstname     Donald Duck
+age                    65
+city         Disney World
+dtype: object
+In [6]:
+#if the index values are passed through a list, all the indexes are passed and 
+# the corresponding values of keys are passed in the series
+# if a particular index doesn't match the key in dictionary then NaN is passed
+# NaN stands for Not a Number
+
+lbl = ['firstname', 'lastname', 'age', ]
+dic = {'firstname':'Donald Duck', 'age':65, 'city':'Disney World'}
+
+pd.Series(dic, lbl)
+Out[6]:
+firstname    Donald Duck
+lastname             NaN
+age                   65
+dtype: object
+In [7]:
+# constant with index values: list
+pd.Series(10, index=['a','b','c'])
+Out[7]:
+a    10
+b    10
+c    10
+dtype: int64
+In [8]:
+# constant with index values:range function
+pd.Series(10,index=range(5))
+Out[8]:
+0    10
+1    10
+2    10
+3    10
+4    10
+dtype: int64
+Accessing series
+We will be using slicing, range slicing and indexing for accessing data of series. We will under stand the attributes of series index and values
+
+In [9]:
+# series of numbers from 11 to 20
+s = pd.Series(range(11,21))
+
+# series from a dictionary
+d = pd.Series({'firstname':'Donald Duck', 'age':65, 'city':'Disney World'})
+In [10]:
+s
+Out[10]:
+0    11
+1    12
+2    13
+3    14
+4    15
+5    16
+6    17
+7    18
+8    19
+9    20
+dtype: int64
+In [11]:
+d
+Out[11]:
+firstname     Donald Duck
+age                    65
+city         Disney World
+dtype: object
+In [12]:
+#accessing data by index
+print(s[1])
+print(d['age'])
+12
+65
+In [13]:
+#accessing the first three elements
+s[:3]
+Out[13]:
+0    11
+1    12
+2    13
+dtype: int64
+In [14]:
+#all indexes
+d.index
+Out[14]:
+Index(['firstname', 'age', 'city'], dtype='object')
+In [15]:
+#all values
+d.values
+Out[15]:
+array(['Donald Duck', 65, 'Disney World'], dtype=object)
+DataFrames
+It generally refers to tabular data: a data structure representing instances(rows), each of which consists of a number of measurements(columns). Alternatively, each row may be treated as a single observation of multiple variables.
+
+Creating DataFrames
+The constructor for pandas dataframe object is pandas.DataFrame( data, index, columns, dtype, copy).
+
+Here,
+
+data: various forms (ndarray, series, map, lists, dict, constants, another DataFrame)
+index: index labels (default np.arange(n))
+columns: column names (default np.arange(n)); True only when index is not specified
+dtype: Data type of each column
+copy: copying of data (default False)
+In [16]:
+#creating dataframe from list
+data = ['Doremon', 'Chota Bhim', 'Powerpuff girls', 'Dexter']
+pd.DataFrame(data, columns=['Name'])
+Out[16]:
+Name
+0	Doremon
+1	Chota Bhim
+2	Powerpuff girls
+3	Dexter
+In [17]:
+#dataframe from list of lists
+pd.DataFrame([[1,2,3],[4,5,6]])
+Out[17]:
+0	1	2
+0	1	2	3
+1	4	5	6
+In [18]:
+#creating dataframe with columns called 'Name' and 'Age' from list of lists
+data =[['Rob',25],['Bobby',30],['John',21],['Danny',32],['Manny',23]]
+pd.DataFrame(data,columns = ['Name','Age'])
+Out[18]:
+Name	Age
+0	Rob	25
+1	Bobby	30
+2	John	21
+3	Danny	32
+4	Manny	23
+In [19]:
+# converting 2D array into data frame 
+pd.DataFrame(np.arange(10,20).reshape(5,2),columns=["A","B"])
+Out[19]:
+A	B
+0	10	11
+1	12	13
+2	14	15
+3	16	17
+4	18	19
+In [20]:
+#creating dataframe from a dictionary
+dic = {'name':['Jitesh','Kalpesh','Simran'],'math':[80,70,85],'science':[78,56,68]}
+pd.DataFrame(dic)
+Out[20]:
+name	math	science
+0	Jitesh	80	78
+1	Kalpesh	70	56
+2	Simran	85	68
+In [21]:
+#creating dataframe from dictionary and passing index values
+pd.DataFrame(dic, index=['J', 'K', 'S'])
+Out[21]:
+name	math	science
+J	Jitesh	80	78
+K	Kalpesh	70	56
+S	Simran	85	68
+In [22]:
+#creating dataframe from list of dictionaries
+data = [{'name':'Google', 'rank':1}, {'name':'Facebook', 'rank':2}, {'name':'IBM', 'rank':3}, {'name':'Microsoft', 'rank':4}]
+pd.DataFrame(data)
+Out[22]:
+name	rank
+0	Google	1
+1	Facebook	2
+2	IBM	3
+3	Microsoft	4
+In [23]:
+#dataframe from series
+pd.DataFrame({'Name':pd.Series(['Rob','Bobby','John','Danny','Manny'],index=['R','B','J','D','M']),
+                    'Age':pd.Series([25,30,21,32,23],index=['R','B','J','D','M'])})
+Out[23]:
+Name	Age
+R	Rob	25
+B	Bobby	30
+J	John	21
+D	Danny	32
+M	Manny	23
+In [24]:
+# creating dataframe from lists of dictionary
+data = [{'name':'Google', 'rank':1}, 
+        {'name':'Facebook', 'rank':2}, 
+        {'name':'IBM', 'rank':3}, 
+        {'name':'Microsoft', 'rank':4}]
+df = pd.DataFrame(data)
+df
+Out[24]:
+name	rank
+0	Google	1
+1	Facebook	2
+2	IBM	3
+3	Microsoft	4
+Modifying Dataframe
+In [25]:
+# adding new column to dataframe
+df['owner'] = ['Larry Page', "Mark Z", 'test', 'Bill Gates']
+df['shares'] = [70, 15, 2, 13] 
+df
+Out[25]:
+name	rank	owner	shares
+0	Google	1	Larry Page	70
+1	Facebook	2	Mark Z	15
+2	IBM	3	test	2
+3	Microsoft	4	Bill Gates	13
+In [26]:
+#adding new index
+df.index=['G', 'F', 'I', 'M']
+df
+Out[26]:
+name	rank	owner	shares
+G	Google	1	Larry Page	70
+F	Facebook	2	Mark Z	15
+I	IBM	3	test	2
+M	Microsoft	4	Bill Gates	13
+Indexing and Slicing
+In [27]:
+# accessing records
+#accessing data by column name
+df['name']
+Out[27]:
+G       Google
+F     Facebook
+I          IBM
+M    Microsoft
+Name: name, dtype: object
+In [28]:
+#accessing multiple column names
+df[['name', 'owner']]
+Out[28]:
+name	owner
+G	Google	Larry Page
+F	Facebook	Mark Z
+I	IBM	test
+M	Microsoft	Bill Gates
+In [29]:
+#fetch records by index name
+print(df.ix['I']) #deprecated
+name       IBM
+rank         3
+owner     test
+shares       2
+Name: I, dtype: object
+C:\Users\itvedant-le2\Anaconda3\lib\site-packages\ipykernel_launcher.py:2: FutureWarning: 
+.ix is deprecated. Please use
+.loc for label based indexing or
+.iloc for positional indexing
+
+See the documentation here:
+http://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#ix-indexer-is-deprecated
+  
+In [30]:
+#fetch records by index name
+print(df.loc['G'])
+name          Google
+rank               1
+owner     Larry Page
+shares            70
+Name: G, dtype: object
+In [31]:
+# acccessing data using row number. Row number always begins with zero
+print(df.iloc[0])
+name          Google
+rank               1
+owner     Larry Page
+shares            70
+Name: G, dtype: object
+In [32]:
+#range selection of complete row
+df.iloc[0:2]
+Out[32]:
+name	rank	owner	shares
+G	Google	1	Larry Page	70
+F	Facebook	2	Mark Z	15
+In [33]:
+#range selection of rows and columns
+df.iloc[0:2, 0:2]
+Out[33]:
+name	rank
+G	Google	1
+F	Facebook	2
+In [34]:
+#index selection of row and name selection of columns
+df.loc[['G','I'], ['name']]
+Out[34]:
+name
+G	Google
+I	IBM
+In [35]:
+#accessing multiple rows, if an index that is not available that is passed it will display NaN
+df.loc[['G','X'], ['name']]
+C:\Users\itvedant-le2\Anaconda3\lib\site-packages\pandas\core\indexing.py:1418: FutureWarning: 
+Passing list-likes to .loc or [] with any missing label will raise
+KeyError in the future, you can use .reindex() as an alternative.
+
+See the documentation here:
+https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#deprecate-loc-reindex-listlike
+  return self._getitem_tuple(key)
+Out[35]:
+name
+G	Google
+X	NaN
+In [36]:
+#accessing multiple rows and columns
+df.loc[['G','I'], ['name','owner']]
+Out[36]:
+name	owner
+G	Google	Larry Page
+I	IBM	test
+In [37]:
+#change the str index to numeric index
+df.index=range(len(df))
+df
+Out[37]:
+name	rank	owner	shares
+0	Google	1	Larry Page	70
+1	Facebook	2	Mark Z	15
+2	IBM	3	test	2
+3	Microsoft	4	Bill Gates	13
+In [38]:
+#range selection of row and name selection of columns
+df.loc[0:2,'name']
+Out[38]:
+0      Google
+1    Facebook
+2         IBM
+Name: name, dtype: object
+In [39]:
+# accessing row with range and multiple columns by name.
+df.loc[0:2,['name','owner']]
+Out[39]:
+name	owner
+0	Google	Larry Page
+1	Facebook	Mark Z
+2	IBM	test
+In [40]:
+#slicing using column name and index
+# df[col][row]
+df['name'][1]
+Out[40]:
+'Facebook'
+In [41]:
+#df.iloc[row index,col index] in number
+df.iloc[2,0]
+Out[41]:
+'IBM'
+In [42]:
+#df.loc[row, colname]
+df.loc[0,'name']
+Out[42]:
+'Google'
+In [43]:
+#changing index back to str
+df.index=['G', 'F', 'I', 'M']
+In [44]:
+# df[col][row]
+df['owner']['G']
+Out[44]:
+'Larry Page'
+In [45]:
+#df.iloc[row index,col index] in number
+df.iloc[0,2]
+Out[45]:
+'Larry Page'
+In [46]:
+#df.loc[row, colname]
+df.loc['G','owner']
+Out[46]:
+'Larry Page'
+Modifying Dataframe continued
+In [47]:
+# Deleting columns from dataframe
+del df['owner']
+df
+Out[47]:
+name	rank	shares
+G	Google	1	70
+F	Facebook	2	15
+I	IBM	3	2
+M	Microsoft	4	13
+In [48]:
+#deleting a column using drop function. axis 1 stands for column. 
+# While dropping a column the first parameter is column name and axis = 1
+df.drop('rank', axis=1)
+Out[48]:
+name	shares
+G	Google	70
+F	Facebook	15
+I	IBM	2
+M	Microsoft	13
+In [49]:
+#deleting a row using drop function. axis 0 stands for row
+# While dropping a row the first parameter is index and axis = 0
+df.drop('I', axis=0)
+Out[49]:
+name	rank	shares
+G	Google	1	70
+F	Facebook	2	15
+M	Microsoft	4	13
+Extracting data from various sources
+In [50]:
+#Copying from clipboard, copy any table from internet and execute the following command:
+pd.read_clipboard()
+Out[50]:
+y_float_test
+If the file has a .csv format use
+
+pandas.read_csv(filepath_or_buffer, sep=',', delimiter=None, header='infer',names=None, index_col=None, usecols=None)
+
+** to convert a file into a DataFrame. Most of the files you encounter will be in CSV format.
+
+Here,
+
+filepath_or_buffer: the path to the file
+sep: Delimiter to use
+delimiter: Alternative argument name for sep (default None)
+header: Row number(s) to use as the column names, and the start of the data
+names: List of column names to use
+index_col: Column to use as the row labels of the DataFrame
+usecols: Return a subset of the columns
+In [51]:
+#get data from .csv file into panda dataframe
+df = pd.read_csv('marks.csv')
+df
+Out[51]:
+name:marks
+0	Jitesh:90
+1	Kalpesh:100
+2	Simran:80
+In [52]:
+#get data from .csv file into panda dataframe using sep
+df = pd.read_csv('marks.csv', sep=":")
+df
+Out[52]:
+name	marks
+0	Jitesh	90
+1	Kalpesh	100
+2	Simran	80
+reading files and understanding data
+In [53]:
+df = pd.read_csv('matches.csv')
+df
+Out[53]:
+id	season	city	date	team1	team2	toss_winner	toss_decision	result	dl_applied	winner	win_by_runs	win_by_wickets	player_of_match	venue	umpire1	umpire2	umpire3
+0	1	2017	Hyderabad	2017-04-05	Sunrisers Hyderabad	Royal Challengers Bangalore	Royal Challengers Bangalore	field	normal	0	Sunrisers Hyderabad	35	0	Yuvraj Singh	Rajiv Gandhi International Stadium, Uppal	AY Dandekar	NJ Llong	NaN
+1	2	2017	Pune	2017-04-06	Mumbai Indians	Rising Pune Supergiant	Rising Pune Supergiant	field	normal	0	Rising Pune Supergiant	0	7	SPD Smith	Maharashtra Cricket Association Stadium	A Nand Kishore	S Ravi	NaN
+2	3	2017	Rajkot	2017-04-07	Gujarat Lions	Kolkata Knight Riders	Kolkata Knight Riders	field	normal	0	Kolkata Knight Riders	0	10	CA Lynn	Saurashtra Cricket Association Stadium	Nitin Menon	CK Nandan	NaN
+3	4	2017	Indore	2017-04-08	Rising Pune Supergiant	Kings XI Punjab	Kings XI Punjab	field	normal	0	Kings XI Punjab	0	6	GJ Maxwell	Holkar Cricket Stadium	AK Chaudhary	C Shamshuddin	NaN
+4	5	2017	Bangalore	2017-04-08	Royal Challengers Bangalore	Delhi Daredevils	Royal Challengers Bangalore	bat	normal	0	Royal Challengers Bangalore	15	0	KM Jadhav	M Chinnaswamy Stadium	NaN	NaN	NaN
+...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...
+631	632	2016	Raipur	2016-05-22	Delhi Daredevils	Royal Challengers Bangalore	Royal Challengers Bangalore	field	normal	0	Royal Challengers Bangalore	0	6	V Kohli	Shaheed Veer Narayan Singh International Stadium	A Nand Kishore	BNJ Oxenford	NaN
+632	633	2016	Bangalore	2016-05-24	Gujarat Lions	Royal Challengers Bangalore	Royal Challengers Bangalore	field	normal	0	Royal Challengers Bangalore	0	4	AB de Villiers	M Chinnaswamy Stadium	AK Chaudhary	HDPK Dharmasena	NaN
+633	634	2016	Delhi	2016-05-25	Sunrisers Hyderabad	Kolkata Knight Riders	Kolkata Knight Riders	field	normal	0	Sunrisers Hyderabad	22	0	MC Henriques	Feroz Shah Kotla	M Erasmus	C Shamshuddin	NaN
+634	635	2016	Delhi	2016-05-27	Gujarat Lions	Sunrisers Hyderabad	Sunrisers Hyderabad	field	normal	0	Sunrisers Hyderabad	0	4	DA Warner	Feroz Shah Kotla	M Erasmus	CK Nandan	NaN
+635	636	2016	Bangalore	2016-05-29	Sunrisers Hyderabad	Royal Challengers Bangalore	Sunrisers Hyderabad	bat	normal	0	Sunrisers Hyderabad	8	0	BCJ Cutting	M Chinnaswamy Stadium	HDPK Dharmasena	BNJ Oxenford	NaN
+636 rows × 18 columns
+
+In [54]:
+# head() : show only first five elements of the DataFrame
+df.head()
+Out[54]:
+id	season	city	date	team1	team2	toss_winner	toss_decision	result	dl_applied	winner	win_by_runs	win_by_wickets	player_of_match	venue	umpire1	umpire2	umpire3
+0	1	2017	Hyderabad	2017-04-05	Sunrisers Hyderabad	Royal Challengers Bangalore	Royal Challengers Bangalore	field	normal	0	Sunrisers Hyderabad	35	0	Yuvraj Singh	Rajiv Gandhi International Stadium, Uppal	AY Dandekar	NJ Llong	NaN
+1	2	2017	Pune	2017-04-06	Mumbai Indians	Rising Pune Supergiant	Rising Pune Supergiant	field	normal	0	Rising Pune Supergiant	0	7	SPD Smith	Maharashtra Cricket Association Stadium	A Nand Kishore	S Ravi	NaN
+2	3	2017	Rajkot	2017-04-07	Gujarat Lions	Kolkata Knight Riders	Kolkata Knight Riders	field	normal	0	Kolkata Knight Riders	0	10	CA Lynn	Saurashtra Cricket Association Stadium	Nitin Menon	CK Nandan	NaN
+3	4	2017	Indore	2017-04-08	Rising Pune Supergiant	Kings XI Punjab	Kings XI Punjab	field	normal	0	Kings XI Punjab	0	6	GJ Maxwell	Holkar Cricket Stadium	AK Chaudhary	C Shamshuddin	NaN
+4	5	2017	Bangalore	2017-04-08	Royal Challengers Bangalore	Delhi Daredevils	Royal Challengers Bangalore	bat	normal	0	Royal Challengers Bangalore	15	0	KM Jadhav	M Chinnaswamy Stadium	NaN	NaN	NaN
+In [55]:
+# head function also accepts a numeric input when you wish to more records
+df.head(10)
+Out[55]:
+id	season	city	date	team1	team2	toss_winner	toss_decision	result	dl_applied	winner	win_by_runs	win_by_wickets	player_of_match	venue	umpire1	umpire2	umpire3
+0	1	2017	Hyderabad	2017-04-05	Sunrisers Hyderabad	Royal Challengers Bangalore	Royal Challengers Bangalore	field	normal	0	Sunrisers Hyderabad	35	0	Yuvraj Singh	Rajiv Gandhi International Stadium, Uppal	AY Dandekar	NJ Llong	NaN
+1	2	2017	Pune	2017-04-06	Mumbai Indians	Rising Pune Supergiant	Rising Pune Supergiant	field	normal	0	Rising Pune Supergiant	0	7	SPD Smith	Maharashtra Cricket Association Stadium	A Nand Kishore	S Ravi	NaN
+2	3	2017	Rajkot	2017-04-07	Gujarat Lions	Kolkata Knight Riders	Kolkata Knight Riders	field	normal	0	Kolkata Knight Riders	0	10	CA Lynn	Saurashtra Cricket Association Stadium	Nitin Menon	CK Nandan	NaN
+3	4	2017	Indore	2017-04-08	Rising Pune Supergiant	Kings XI Punjab	Kings XI Punjab	field	normal	0	Kings XI Punjab	0	6	GJ Maxwell	Holkar Cricket Stadium	AK Chaudhary	C Shamshuddin	NaN
+4	5	2017	Bangalore	2017-04-08	Royal Challengers Bangalore	Delhi Daredevils	Royal Challengers Bangalore	bat	normal	0	Royal Challengers Bangalore	15	0	KM Jadhav	M Chinnaswamy Stadium	NaN	NaN	NaN
+5	6	2017	Hyderabad	2017-04-09	Gujarat Lions	Sunrisers Hyderabad	Sunrisers Hyderabad	field	normal	0	Sunrisers Hyderabad	0	9	Rashid Khan	Rajiv Gandhi International Stadium, Uppal	A Deshmukh	NJ Llong	NaN
+6	7	2017	Mumbai	2017-04-09	Kolkata Knight Riders	Mumbai Indians	Mumbai Indians	field	normal	0	Mumbai Indians	0	4	N Rana	Wankhede Stadium	Nitin Menon	CK Nandan	NaN
+7	8	2017	Indore	2017-04-10	Royal Challengers Bangalore	Kings XI Punjab	Royal Challengers Bangalore	bat	normal	0	Kings XI Punjab	0	8	AR Patel	Holkar Cricket Stadium	AK Chaudhary	C Shamshuddin	NaN
+8	9	2017	Pune	2017-04-11	Delhi Daredevils	Rising Pune Supergiant	Rising Pune Supergiant	field	normal	0	Delhi Daredevils	97	0	SV Samson	Maharashtra Cricket Association Stadium	AY Dandekar	S Ravi	NaN
+9	10	2017	Mumbai	2017-04-12	Sunrisers Hyderabad	Mumbai Indians	Mumbai Indians	field	normal	0	Mumbai Indians	0	4	JJ Bumrah	Wankhede Stadium	Nitin Menon	CK Nandan	NaN
+In [56]:
+# tail() : show only last five elements of the DataFrame
+df.tail()
+Out[56]:
+id	season	city	date	team1	team2	toss_winner	toss_decision	result	dl_applied	winner	win_by_runs	win_by_wickets	player_of_match	venue	umpire1	umpire2	umpire3
+631	632	2016	Raipur	2016-05-22	Delhi Daredevils	Royal Challengers Bangalore	Royal Challengers Bangalore	field	normal	0	Royal Challengers Bangalore	0	6	V Kohli	Shaheed Veer Narayan Singh International Stadium	A Nand Kishore	BNJ Oxenford	NaN
+632	633	2016	Bangalore	2016-05-24	Gujarat Lions	Royal Challengers Bangalore	Royal Challengers Bangalore	field	normal	0	Royal Challengers Bangalore	0	4	AB de Villiers	M Chinnaswamy Stadium	AK Chaudhary	HDPK Dharmasena	NaN
+633	634	2016	Delhi	2016-05-25	Sunrisers Hyderabad	Kolkata Knight Riders	Kolkata Knight Riders	field	normal	0	Sunrisers Hyderabad	22	0	MC Henriques	Feroz Shah Kotla	M Erasmus	C Shamshuddin	NaN
+634	635	2016	Delhi	2016-05-27	Gujarat Lions	Sunrisers Hyderabad	Sunrisers Hyderabad	field	normal	0	Sunrisers Hyderabad	0	4	DA Warner	Feroz Shah Kotla	M Erasmus	CK Nandan	NaN
+635	636	2016	Bangalore	2016-05-29	Sunrisers Hyderabad	Royal Challengers Bangalore	Sunrisers Hyderabad	bat	normal	0	Sunrisers Hyderabad	8	0	BCJ Cutting	M Chinnaswamy Stadium	HDPK Dharmasena	BNJ Oxenford	NaN
+In [57]:
+# tail function also accepts a numeric input when you wish to more records
+df.tail(2)
+Out[57]:
+id	season	city	date	team1	team2	toss_winner	toss_decision	result	dl_applied	winner	win_by_runs	win_by_wickets	player_of_match	venue	umpire1	umpire2	umpire3
+634	635	2016	Delhi	2016-05-27	Gujarat Lions	Sunrisers Hyderabad	Sunrisers Hyderabad	field	normal	0	Sunrisers Hyderabad	0	4	DA Warner	Feroz Shah Kotla	M Erasmus	CK Nandan	NaN
+635	636	2016	Bangalore	2016-05-29	Sunrisers Hyderabad	Royal Challengers Bangalore	Sunrisers Hyderabad	bat	normal	0	Sunrisers Hyderabad	8	0	BCJ Cutting	M Chinnaswamy Stadium	HDPK Dharmasena	BNJ Oxenford	NaN
+In [58]:
+# General information of every column
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 636 entries, 0 to 635
+Data columns (total 18 columns):
+id                 636 non-null int64
+season             636 non-null int64
+city               629 non-null object
+date               636 non-null object
+team1              636 non-null object
+team2              636 non-null object
+toss_winner        636 non-null object
+toss_decision      636 non-null object
+result             636 non-null object
+dl_applied         636 non-null int64
+winner             633 non-null object
+win_by_runs        636 non-null int64
+win_by_wickets     636 non-null int64
+player_of_match    633 non-null object
+venue              636 non-null object
+umpire1            635 non-null object
+umpire2            635 non-null object
+umpire3            0 non-null float64
+dtypes: float64(1), int64(5), object(12)
+memory usage: 89.6+ KB
+In [59]:
+# Data type of every column
+df.dtypes
+Out[59]:
+id                   int64
+season               int64
+city                object
+date                object
+team1               object
+team2               object
+toss_winner         object
+toss_decision       object
+result              object
+dl_applied           int64
+winner              object
+win_by_runs          int64
+win_by_wickets       int64
+player_of_match     object
+venue               object
+umpire1             object
+umpire2             object
+umpire3            float64
+dtype: object
+In [60]:
+# Display column names
+df.columns
+Out[60]:
+Index(['id', 'season', 'city', 'date', 'team1', 'team2', 'toss_winner',
+       'toss_decision', 'result', 'dl_applied', 'winner', 'win_by_runs',
+       'win_by_wickets', 'player_of_match', 'venue', 'umpire1', 'umpire2',
+       'umpire3'],
+      dtype='object')
+In [61]:
+# Check dimensions: To check dimensions of dataframe
+df.shape
+Out[61]:
+(636, 18)
+In [62]:
+# the describe function will return count, mean, standard deviation, min, max, q1, q2, q3 of each column in the dataframe
+df.describe()
+Out[62]:
+id	season	dl_applied	win_by_runs	win_by_wickets	umpire3
+count	636.000000	636.000000	636.000000	636.000000	636.000000	0.0
+mean	318.500000	2012.490566	0.025157	13.682390	3.372642	NaN
+std	183.741666	2.773026	0.156726	23.908877	3.420338	NaN
+min	1.000000	2008.000000	0.000000	0.000000	0.000000	NaN
+25%	159.750000	2010.000000	0.000000	0.000000	0.000000	NaN
+50%	318.500000	2012.000000	0.000000	0.000000	4.000000	NaN
+75%	477.250000	2015.000000	0.000000	20.000000	7.000000	NaN
+max	636.000000	2017.000000	1.000000	146.000000	10.000000	NaN
+In [63]:
+# Check missing values per column
+df.isnull()
+Out[63]:
+id	season	city	date	team1	team2	toss_winner	toss_decision	result	dl_applied	winner	win_by_runs	win_by_wickets	player_of_match	venue	umpire1	umpire2	umpire3
+0	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	True
+1	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	True
+2	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	True
+3	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	True
+4	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	True	True	True
+...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...
+631	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	True
+632	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	True
+633	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	True
+634	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	True
+635	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	False	True
+636 rows × 18 columns
+
+In [64]:
+# Check missing values and count per column 
+df.isnull().sum()
+Out[64]:
+id                   0
+season               0
+city                 7
+date                 0
+team1                0
+team2                0
+toss_winner          0
+toss_decision        0
+result               0
+dl_applied           0
+winner               3
+win_by_runs          0
+win_by_wickets       0
+player_of_match      3
+venue                0
+umpire1              1
+umpire2              1
+umpire3            636
+dtype: int64
+In [65]:
+# to check not a number value in the data
+df.isna().sum()
+Out[65]:
+id                   0
+season               0
+city                 7
+date                 0
+team1                0
+team2                0
+toss_winner          0
+toss_decision        0
+result               0
+dl_applied           0
+winner               3
+win_by_runs          0
+win_by_wickets       0
+player_of_match      3
+venue                0
+umpire1              1
+umpire2              1
+umpire3            636
+dtype: int64
+In [66]:
+# Check number of unique values per column
+df.nunique()
+Out[66]:
+id                 636
+season              10
+city                30
+date               450
+team1               14
+team2               14
+toss_winner         14
+toss_decision        2
+result               3
+dl_applied           2
+winner              14
+win_by_runs         86
+win_by_wickets      11
+player_of_match    201
+venue               35
+umpire1             44
+umpire2             45
+umpire3              0
+dtype: int64
+In [67]:
+#Give unique value from column
+df['season'].unique()
+Out[67]:
+array([2017, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016],
+      dtype=int64)
+In [68]:
+# Will count how many time that value is repeat in data
+df['season'].value_counts()
+Out[68]:
+2013    76
+2012    74
+2011    73
+2016    60
+2014    60
+2010    60
+2017    59
+2015    59
+2008    58
+2009    57
+Name: season, dtype: int64
+In [69]:
+#When you want to squeeze the output you need to change the same using set_options
+pd.set_option('max_rows', 5, 'max_columns', 5)
+df
+Out[69]:
+id	season	...	umpire2	umpire3
+0	1	2017	...	NJ Llong	NaN
+1	2	2017	...	S Ravi	NaN
+...	...	...	...	...	...
+634	635	2016	...	CK Nandan	NaN
+635	636	2016	...	BNJ Oxenford	NaN
+636 rows × 18 columns
+
+In [70]:
+# Dropping missing values
+df.dropna()
+Out[70]:
+id	season	...	umpire2	umpire3
+0 rows × 18 columns
+
+In [ ]:
